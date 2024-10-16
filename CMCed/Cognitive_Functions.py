@@ -1,5 +1,5 @@
+from CMCed.utility import *
 
-from utility import Utility
 
 
 
