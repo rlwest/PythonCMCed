@@ -29,7 +29,7 @@ declarative_memory = {'fries': {'name': 'fries',
                                   'utility':7},
                       'ceasar_salad': {'name': 'ceasar_salad',
                                        'condition': 'bad',
-                                       'side_order': 'yes',
+                                       'side_order': 'no',
                                        'utility':9}
                       }
 memories = {
@@ -43,17 +43,20 @@ ProceduralProductions = []
 
 # Procedural Production to announce the sandwich is ready
 def announce_sandwich(memories):
-    decay_all_memory_chunks(memories, 'declarative_memory',1)
+    # add noise
+    #add_noise_to_utility(declarative_memory, 'declarative_memory', scalar=0.5)
+    # add decay
+    #decay_all_memory_chunks(memories, 'declarative_memory',1)
+    # add boost
     #utility_change(memories, 'declarative_memory', 'poutine', 1, max_utility=10)
-    #report_memory_contents(declarative_memory, "Declarative Memory")
+    # set memory retrieval variables
     target_memory = declarative_memory
-    cue = {'matches': {'side_order': 'yes'}, 'negations': {'condition': 'good'}}
+    cue = {'matches': {'side_order': 'no'}, 'negations': {'condition': '*'}}
+    # retrieve with threshold (threshold default = 0
+    retrieved_chunk = match_chunks_with_diagnostics(target_memory, cue, utility_threshold=0)
+    # report memory contents
     report_memory_contents(declarative_memory, "Declarative Memory", cue)
-
-    #retrieved_chunk = match_chunks_with_diagnostics(target_memory, cue)
-    retrieved_chunk = match_chunks_with_diagnostics(target_memory, cue, utility_threshold=2)
-    print("Retrieved:", retrieved_chunk)
-    print("Retrieved:", retrieved_chunk)
+    # print results
     print('I recall the side order was.........................................***************************')
     print(retrieved_chunk['name'])
 
@@ -83,4 +86,4 @@ AllProductionSystems = {
 ps = ProductionCycle()
 
 # Run the cycle with custom parameters
-ps.run_cycles(memories, AllProductionSystems, DelayResetValues, cycles=9, millisecpercycle=10)
+ps.run_cycles(memories, AllProductionSystems, DelayResetValues, cycles=1, millisecpercycle=10)
