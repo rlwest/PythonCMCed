@@ -1,5 +1,5 @@
 """
-these funcitons perform basic actions in the produciton system
+these funcitons perform basic actions for the production cycle and the cognitive functions
 """
 
 

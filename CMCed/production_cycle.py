@@ -1,4 +1,4 @@
-from utility import Utility
+from CMCed.utility import *
 
 class ProductionCycle:
     def __init__(self):

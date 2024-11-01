@@ -1,8 +1,8 @@
 # uses a generic motor production to do all actions
+#from CMCed.utility import *
 
-from utility import Utility
-from production_cycle import ProductionCycle
-from Cognitive_Functions import match_chunks_with_diagnostics
+from CMCed.production_cycle import ProductionCycle
+from CMCed.Cognitive_Functions import match_chunks_with_diagnostics
 
 
 # Initialize memories
