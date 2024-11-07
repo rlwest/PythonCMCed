@@ -1,5 +1,5 @@
-from utility import Utility
-from production_cycle import ProductionCycle
+from CMCed.production_cycle import ProductionCycle
+from CMCed.Cognitive_Functions import *
 
 ### this is a follow up on test_parallal_productions3
 ### it changes the order of the production systems firing

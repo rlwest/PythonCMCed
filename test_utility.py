@@ -1,7 +1,7 @@
 
 import unittest
 import random
-from utility import Utility  # Import the Utility class from the utility module
+from CMCed.utility import *
 
 class TestUtility(unittest.TestCase):
     # TestUtility class inherits from unittest.TestCase, which provides a framework for writing and running tests

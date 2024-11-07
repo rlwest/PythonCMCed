@@ -1,5 +1,5 @@
-from utility import Utility
-from production_cycle import ProductionCycle
+from CMCed.production_cycle import ProductionCycle
+from CMCed.Cognitive_Functions import *
 
 ### same as test_parallel_productions1 but does a criss cross
 ### this shows that productions can update buffers regardless of

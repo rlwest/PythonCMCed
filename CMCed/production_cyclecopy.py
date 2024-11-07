@@ -1,5 +1,4 @@
 from CMCed.utility import *
-# nov 7
 
 class ProductionCycle:
     def __init__(self):
@@ -27,19 +26,10 @@ class ProductionCycle:
                     for buffer_key, match_criteria in buffer_conditions.items():
                         if memory_system_key in memories and buffer_key in memories[memory_system_key]:
                             memory_content = memories[memory_system_key][buffer_key]
-                            # debug
-                            #extracted_negations = production['negations'].get(memory_system_key, {}).get(buffer_key, {})
-                            extracted_negations = production['negations'].get(buffer_key, {})
-                            print(f"[DEBUG] Corrected extracted negations for '{buffer_key}': {extracted_negations}")
-                            print(f"[DEBUG] Extracted negations for '{memory_system_key}' and buffer '{buffer_key}': {extracted_negations}")
-                            print(f"[DEBUG] Full production structure: {production}")
-                            ## debug
-                            print(f"[DEBUG] Passing extracted negations to buffer_match_eval: {extracted_negations}")
                             if not Utility.buffer_match_eval(
                                 memory_content,
                                 match_criteria,
-                                #production['negations'].get(memory_system_key, {}).get(buffer_key, {})
-                                extracted_negations
+                                production['negations'].get(memory_system_key, {}).get(buffer_key, {})
                             ):
                                 is_match_for_all_conditions = False
                                 break

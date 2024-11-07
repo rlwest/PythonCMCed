@@ -20,9 +20,7 @@ class Utility:  # this class provides utility functions for matching and choosin
         Returns:
             bool: True if the key exists in the dictionary and the corresponding value matches, False otherwise.
         """
-        #print(f"[DEBUG] Passing negations to buffer_match_eval: {negations}")
         return key in target_dict and (value == wildcard or target_dict[key] == value)
-
 
     @staticmethod
     def check_positive_matches(buffer_dict, matching_dict, wildcard='*'):
@@ -35,7 +33,6 @@ class Utility:  # this class provides utility functions for matching and choosin
         Returns:
             bool: True if all key-value pairs match, False otherwise.
         """
-        #print(f"[DEBUG] Passing negations to buffer_match_eval: {negations}")
         return all(Utility.check_match(key, value, buffer_dict, wildcard) for key, value in matching_dict.items())
 
     @staticmethod
@@ -48,16 +45,10 @@ class Utility:  # this class provides utility functions for matching and choosin
         Returns:
             bool: True if none of the key-value pairs are found in the buffer dictionary, False otherwise.
         """
-        #print(f"[DEBUG] Passing negations to buffer_match_eval: {negations}")
         return not any(Utility.check_match(key, value, buffer_dict) for key, value in negation_dict.items())
 
     @staticmethod
     def buffer_match_eval(buffer_dict, matching_dict, negation_dict, wildcard='*'):
-        print(f"[DEBUG] Entered buffer_match_eval:")
-        print(f"Buffer: {buffer_dict}")
-        print(f"Matches: {matching_dict}")
-        print(f"Negations: {negation_dict}")
-        print(f"[DEBUG] Received negations: {negation_dict}")
         """
         Evaluate if a buffer matches given positive and negative conditions.
         Args:
@@ -68,7 +59,6 @@ class Utility:  # this class provides utility functions for matching and choosin
         Returns:
             bool: True if the buffer matches all positive conditions and none of the negative conditions, False otherwise.
         """
-        #print(f"[DEBUG] Passing negations to buffer_match_eval: {negations}")
         return Utility.check_positive_matches(buffer_dict, matching_dict, wildcard) and Utility.check_negative_matches(
             buffer_dict, negation_dict)
 
@@ -96,61 +86,60 @@ class Utility:  # this class provides utility functions for matching and choosin
 
         return random.choice(highest_utility_productions)
 
-    # @staticmethod
-    # # Enhanced buffer match evaluation function with diagnostics.
-    # def buffer_match_eval_diagnostic(buffer_dict, matching_dict, negation_dict, wildcard='*'):
-    #     # Display diagnostic information
-    #     # print(f"\nEvaluating buffer: {buffer_dict}")
-    #     # print(f"Against matching criteria: {matching_dict} and negation criteria: {negation_dict}")
-    #
-    #     # Initialize a dictionary to capture wildcard values
-    #     wildcard_values = {}
-    #     # Iterate over matching conditions
-    #     for key, match_value in matching_dict.items():
-    #         # Handle wildcard values
-    #         if match_value == wildcard:
-    #             # print(f"Wildcard for key: {key}, any value is acceptable.")
-    #             wildcard_values[key] = buffer_dict.get(key, None)  # Capture the actual value from the buffer
-    #             continue
-    #         # Check for a match
-    #         # print(f"Checking match for key: {key} with value: {match_value}")
-    #         if key not in buffer_dict or buffer_dict[key] != match_value:
-    #             # print("Match failed!")
-    #             return False, {}
-    #         # print("Match succeeded!")
-    #
-    #     # Iterate over negation conditions
-    #     for key, neg_value in negation_dict.items():
-    #         # Check for negation
-    #         # print(f"Checking negation for key: {key} with value: {neg_value}")
-    #         if key in buffer_dict and buffer_dict[key] == neg_value:
-    #             # print("Negation failed!")
-    #             return False, {}
-    #         # print("Negation succeeded!")
-    #
-    #     # print("Buffer item passed all criteria.")
-    #     # Return both the result and the captured wildcard values
-    #     return True, wildcard_values
+    @staticmethod
+    # Enhanced buffer match evaluation function with diagnostics.
+    def buffer_match_eval_diagnostic(buffer_dict, matching_dict, negation_dict, wildcard='*'):
+        # Display diagnostic information
+        # print(f"\nEvaluating buffer: {buffer_dict}")
+        # print(f"Against matching criteria: {matching_dict} and negation criteria: {negation_dict}")
 
-    # @staticmethod
-    # # Function to match chunks in a buffer with given cues, considering diagnostics.
-    # def match_chunks_with_diagnostics(buffer, cue):
-    #     matched_chunks_data = []  # Store matched chunks
-    #     # Iterate over each buffer item
-    #     for buffer_key, buffer_value in buffer.items():
-    #         # print(f"\nProcessing buffer item: {buffer_key}")
-    #         # Evaluate buffer item against matching and negation criteria
-    #         match, wildcard_values = Utility.buffer_match_eval_diagnostic(buffer_value, cue['matches'],
-    #                                                                       cue['negations'])
-    #         if match:
-    #             matched_chunk_data = buffer_value.copy()  # Copy matching chunk data
-    #             matched_chunk_data.update(wildcard_values)  # Include wildcard values
-    #             matched_chunks_data.append(matched_chunk_data)  # Add to the list of matched chunks
-    #             print(f"Appending {buffer_key} to matches with wildcard values: {wildcard_values}")
-    #
-    #     # Select the best chunk based on utility
-    #     best_chunk_data = Utility.find_max(matched_chunks_data)
-    #     print(f"[DEBUG] Passing negations to buffer_match_eval: {negations}")
-    #     return best_chunk_data
-    #
+        # Initialize a dictionary to capture wildcard values
+        wildcard_values = {}
+        # Iterate over matching conditions
+        for key, match_value in matching_dict.items():
+            # Handle wildcard values
+            if match_value == wildcard:
+                # print(f"Wildcard for key: {key}, any value is acceptable.")
+                wildcard_values[key] = buffer_dict.get(key, None)  # Capture the actual value from the buffer
+                continue
+            # Check for a match
+            # print(f"Checking match for key: {key} with value: {match_value}")
+            if key not in buffer_dict or buffer_dict[key] != match_value:
+                # print("Match failed!")
+                return False, {}
+            # print("Match succeeded!")
+
+        # Iterate over negation conditions
+        for key, neg_value in negation_dict.items():
+            # Check for negation
+            # print(f"Checking negation for key: {key} with value: {neg_value}")
+            if key in buffer_dict and buffer_dict[key] == neg_value:
+                # print("Negation failed!")
+                return False, {}
+            # print("Negation succeeded!")
+
+        # print("Buffer item passed all criteria.")
+        # Return both the result and the captured wildcard values
+        return True, wildcard_values
+
+    @staticmethod
+    # Function to match chunks in a buffer with given cues, considering diagnostics.
+    def match_chunks_with_diagnostics(buffer, cue):
+        matched_chunks_data = []  # Store matched chunks
+        # Iterate over each buffer item
+        for buffer_key, buffer_value in buffer.items():
+            # print(f"\nProcessing buffer item: {buffer_key}")
+            # Evaluate buffer item against matching and negation criteria
+            match, wildcard_values = Utility.buffer_match_eval_diagnostic(buffer_value, cue['matches'],
+                                                                          cue['negations'])
+            if match:
+                matched_chunk_data = buffer_value.copy()  # Copy matching chunk data
+                matched_chunk_data.update(wildcard_values)  # Include wildcard values
+                matched_chunks_data.append(matched_chunk_data)  # Add to the list of matched chunks
+                # print(f"Appending {buffer_key} to matches with wildcard values: {wildcard_values}")
+
+        # Select the best chunk based on utility
+        best_chunk_data = Utility.find_max(matched_chunks_data)
+        return best_chunk_data
+
 

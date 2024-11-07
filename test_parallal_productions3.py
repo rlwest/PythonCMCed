@@ -1,5 +1,5 @@
-from utility import Utility
-from production_cycle import ProductionCycle
+from CMCed.production_cycle import ProductionCycle
+from CMCed.Cognitive_Functions import *
 
 ### works - the first production makes changes the focus so that the next production
 ### from the other production system can fire

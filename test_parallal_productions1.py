@@ -1,5 +1,5 @@
-from utility import Utility
-from production_cycle import ProductionCycle
+from CMCed.production_cycle import ProductionCycle
+from CMCed.Cognitive_Functions import *
 
 ### parallell production firing
 ### works - procedural productions fire off of working memory and
