@@ -53,7 +53,7 @@ class Utility:  # this class provides utility functions for matching and choosin
 
     @staticmethod
     def buffer_match_eval(buffer_dict, matching_dict, negation_dict, wildcard='*'):
-        print(f"[DEBUG] Entered buffer_match_eval:")
+        #print(f"[DEBUG] Entered buffer_match_eval:")
         print(f"Buffer: {buffer_dict}")
         print(f"Matches: {matching_dict}")
         print(f"Negations: {negation_dict}")

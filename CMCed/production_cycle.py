@@ -30,11 +30,11 @@ class ProductionCycle:
                             # debug
                             #extracted_negations = production['negations'].get(memory_system_key, {}).get(buffer_key, {})
                             extracted_negations = production['negations'].get(buffer_key, {})
-                            print(f"[DEBUG] Corrected extracted negations for '{buffer_key}': {extracted_negations}")
-                            print(f"[DEBUG] Extracted negations for '{memory_system_key}' and buffer '{buffer_key}': {extracted_negations}")
-                            print(f"[DEBUG] Full production structure: {production}")
+                            #print(f"[DEBUG] Corrected extracted negations for '{buffer_key}': {extracted_negations}")
+                            #print(f"[DEBUG] Extracted negations for '{memory_system_key}' and buffer '{buffer_key}': {extracted_negations}")
+                            #print(f"[DEBUG] Full production structure: {production}")
                             ## debug
-                            print(f"[DEBUG] Passing extracted negations to buffer_match_eval: {extracted_negations}")
+                            #print(f"[DEBUG] Passing extracted negations to buffer_match_eval: {extracted_negations}")
                             if not Utility.buffer_match_eval(
                                 memory_content,
                                 match_criteria,
@@ -60,7 +60,7 @@ class ProductionCycle:
 
             if delay <= 1:
                 production['action'](memories)
-                print(f'Action executed: {production.get("report")}')
+                #print(f'Action executed: {production.get("report")}')
                 AllProductionSystems[prod_system_key][1] = DelayResetValues[prod_system_key]
                 del self.pending_actions[i]
             else:
@@ -71,7 +71,7 @@ class ProductionCycle:
 
             if remaining_cycles <= 1:
                 delayed_action(memories)
-                print(f'Delayed action executed after waiting: {delayed_action.__name__}')
+                #print(f'Delayed action executed after waiting: {delayed_action.__name__}')
                 del self.delayed_actions[i]
             else:
                 self.delayed_actions[i] = (delayed_action, remaining_cycles - 1)
@@ -81,7 +81,7 @@ class ProductionCycle:
             highest_utility_production = Utility.find_max(productions)
             if highest_utility_production:
                 delay = highest_utility_production['action'](memories)
-                print(f'Immediate action executed: {highest_utility_production.get("report")}')
+                #print(f'Immediate action executed: {highest_utility_production.get("report")}')
                 AllProductionSystems[prod_system_key][1] = DelayResetValues[prod_system_key]
 
                 # Schedule delayed action
@@ -89,7 +89,7 @@ class ProductionCycle:
                     self.delayed_actions.append(
                         (highest_utility_production['delayed_action'], delay)
                     )
-                    print(f'Delayed action scheduled: {highest_utility_production["delayed_action"].__name__} to be executed in {delay} cycles')
+                    #print(f'Delayed action scheduled: {highest_utility_production["delayed_action"].__name__} to be executed in {delay} cycles')
 
     def execute_actions(self, memories, matched_productions, AllProductionSystems, DelayResetValues):
         self.process_pending_actions(memories, AllProductionSystems, DelayResetValues)
@@ -97,12 +97,12 @@ class ProductionCycle:
 
     def run_cycles(self, memories, AllProductionSystems, DelayResetValues, cycles=5, millisecpercycle=10):
         for cycle_number in range(cycles):
-            print(f'\nCycle {(cycle_number + 1)}, Time: {(cycle_number + 1) * millisecpercycle} ms')
+            #print(f'\nCycle {(cycle_number + 1)}, Time: {(cycle_number + 1) * millisecpercycle} ms')
             matched_productions = self.match_productions(memories, AllProductionSystems)
             # if matched_productions:
             #     print(f'Matched productions: {matched_productions}')
             # else:
             #     print('No productions matched this cycle.')
             self.execute_actions(memories, matched_productions, AllProductionSystems, DelayResetValues)
-            for prod_system_key, prod_system_value in AllProductionSystems.items():
-                print(f'Remaining delay for {prod_system_key}: {prod_system_value[1]} cycles')
+            #for prod_system_key, prod_system_value in AllProductionSystems.items():
+                #print(f'Remaining delay for {prod_system_key}: {prod_system_value[1]} cycles')
