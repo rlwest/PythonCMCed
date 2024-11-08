@@ -95,7 +95,7 @@ ProceduralProductions.append({
     'matches': {'working_memory': {'focus_buffer': {'step': 3}}},
     'negations': {},
     'utility': 10,
-    'action': recall_order2,
+    'action': recall_order3,
     'report': "announce_sandwich"
 })
 def recall_order4(memories):
@@ -114,7 +114,7 @@ ProceduralProductions.append({
     'matches': {'working_memory': {'focus_buffer': {'step': 4}}},
     'negations': {},
     'utility': 10,
-    'action': recall_order2,
+    'action': recall_order4,
     'report': "announce_sandwich"
 })
 
