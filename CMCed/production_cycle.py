@@ -97,7 +97,7 @@ class ProductionCycle:
 
     def run_cycles(self, memories, AllProductionSystems, DelayResetValues, cycles=5, millisecpercycle=10):
         for cycle_number in range(cycles):
-            #print(f'\nCycle {(cycle_number + 1)}, Time: {(cycle_number + 1) * millisecpercycle} ms')
+            print(f'\nCycle {(cycle_number + 1)}, Time: {(cycle_number + 1) * millisecpercycle} ms')
             matched_productions = self.match_productions(memories, AllProductionSystems)
             # if matched_productions:
             #     print(f'Matched productions: {matched_productions}')
