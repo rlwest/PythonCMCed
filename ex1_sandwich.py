@@ -1,7 +1,7 @@
 #  this file uses motor productions to model actions in the environment that take time
 
-from utility import Utility
-from production_cycle import ProductionCycle
+from CMCed.production_cycle import ProductionCycle
+from CMCed.Cognitive_Functions import *
 
 ### works but only complete up to cheese
 ### may be some issues still
@@ -24,7 +24,9 @@ MotorProductions = []
 def bread1(memories):
     memories['working_memory']['motorbuffer']['state'] = 'do_bread1'
     memories['working_memory']['focusbuffer']['state'] = 'cheese'
-    print(f"bread1 executed. Updated working_memory: {memories['working_memory']}")
+    # print(f"bread1 executed. Updated working_memory: {memories['working_memory']}")
+    print('*********************************************************************************** 1')
+
 ProceduralProductions.append({
     'matches': {'working_memory': {'focusbuffer': {'state': 'bread1'}, 'motorbuffer': {'state': 'no_action'}}},
     'negations': {},
@@ -56,7 +58,8 @@ MotorProductions.append({
 def cheese(memories):
     memories['working_memory']['motorbuffer']['state'] = 'do_cheese'
     memories['working_memory']['focusbuffer']['state'] = 'ham'
-    print(f"cheese executed. Updated working_memory: {memories['working_memory']}")
+    print('*********************************************************************************** 2')
+    #print(f"cheese executed. Updated working_memory: {memories['working_memory']}")
 ProceduralProductions.append({
     'matches': {'working_memory': {'focusbuffer': {'state': 'cheese'}, 'motorbuffer': {'state': 'no_action'}}},
     'negations': {},
@@ -67,15 +70,17 @@ ProceduralProductions.append({
 
 def move_cheese(memories):
     memories['working_memory']['motorbuffer']['state'] = 'moving_cheese'
-    print(f"move_cheese executed. Updated working_memory: {memories['working_memory']}")
+    #print(f"move_cheese executed. Updated working_memory: {memories['working_memory']}")
     print('set action completion for 3 cycles later')
     return 3
 
 def delayed_mc(memories):
     memories['environment_memory']['cheese']['location'] = 'plate'
     memories['working_memory']['motorbuffer']['state'] = 'no_action'
-    print(f"delayed_action executed. Updated environment_memory: {memories['environment_memory']}")
-    print(f"delayed_action executed. Updated working_memory: {memories['working_memory']}")
+    #print(f"delayed_action executed. Updated environment_memory: {memories['environment_memory']}")
+    #print(f"delayed_action executed. Updated working_memory: {memories['working_memory']}")
+    print('*********************************************************************************** 3')
+
 MotorProductions.append({
     'matches': {'working_memory': {'motorbuffer': {'state': 'do_cheese'}}},
     'negations': {},
@@ -88,7 +93,7 @@ MotorProductions.append({
 def ham(memories):
     memories['working_memory']['motorbuffer']['state'] = 'do_ham'
     memories['working_memory']['focusbuffer']['state'] = 'bread2'
-    print(f"ham executed. Updated working_memory: {memories['working_memory']}")
+    #print(f"ham executed. Updated working_memory: {memories['working_memory']}")
 ProceduralProductions.append({
     'matches': {'working_memory': {'focusbuffer': {'state': 'ham'}, 'motorbuffer': {'state': 'no_action'}}},
     'negations': {},

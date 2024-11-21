@@ -2,7 +2,6 @@
 #from CMCed.utility import *
 
 from CMCed.production_cycle import ProductionCycle
-from CMCed.Cognitive_Functions import match_chunks_with_diagnostics
 from CMCed.Cognitive_Functions import *
 
 
@@ -22,7 +21,7 @@ declarative_memory = {'fries': {'name': 'fries',
                       'house_salad': {'name': 'house_salad',
                                       'condition': 'good',
                                       'side_order': 'yes',
-                                      'utility':7},
+                                      'utility':3},
                       'poutine': {'name': 'poutine',
                                   'condition': 'good',
                                   'side_order': 'yes',
@@ -50,13 +49,21 @@ def announce_sandwich(memories):
     # add boost
     #utility_change(memories, 'declarative_memory', 'poutine', 1, max_utility=10)
     # set memory retrieval variables
-    target_memory = declarative_memory
-    cue = {'matches': {'side_order': 'no'}, 'negations': {'condition': '*'}}
+    #target_memory = declarative_memory
+    #cue = {'matches': {'side_order': 'no'}, 'negations': {'condition': '*'}}
     # retrieve with threshold (threshold default = 0
-    retrieved_chunk = match_chunks_with_diagnostics(target_memory, cue, utility_threshold=0)
-    # report memory contents
-    report_memory_contents(declarative_memory, "Declarative Memory", cue)
-    # print results
+    #retrieved_chunk = match_chunks_with_diagnostics(target_memory, cue, utility_threshold=0)
+    #chunk_description = {'name': 'poutine', 'condition': 'good', 'side_order': 'yes'}
+    chunk_description = {'name': 'house_salad', 'condition': 'good', 'side_order': 'yes'}
+    #chunk_description = {'name': 'fries', 'condition': 'good', 'side_order': 'yes'}
+    utility_change_by_description(memories, 'declarative_memory', chunk_description, amount=2, max_utility=10)
+
+    buffer = declarative_memory
+    matches = {'side_order': 'yes', 'condition': '*'}
+    negations = {'extra': '*'}
+    report_memory_contents(buffer, matches, negations)    # print results
+# get the chunk
+    retrieved_chunk = retrieve_memory_chunk(buffer, matches, negations)
     print('I recall the side order was.........................................***************************')
     print(retrieved_chunk['name'])
 

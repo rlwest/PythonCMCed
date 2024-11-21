@@ -81,6 +81,55 @@ def utility_change(memories, memory_store, chunk_name, amount, max_utility=None)
 
     print(f"Updated utility for {chunk_name}: {chunk['utility']}")
 
+def utility_change_by_description(memories, memory_store, chunk_description, amount, max_utility=None):
+    """
+    Adjust the utility of a specific chunk by finding a match based on its description. Ensures the utility
+    doesn't go below 0 and can optionally be capped by a specified max_utility. If multiple chunks match
+    the description, an error message is printed.
+
+    :param memories: Dictionary of memories (including declarative memory)
+    :param memory_store: The memory store where the chunks reside (e.g., 'declarative_memory')
+    :param chunk_description: A dictionary describing the chunk to find
+    :param amount: The amount to change the utility by (positive or negative)
+    :param max_utility: (Optional) The maximum allowable utility value for the chunk
+    """
+    matches = []  # Keep track of matching chunks
+
+    # Find all matching chunks
+    for chunk_name, chunk_data in memories[memory_store].items():
+        if all(chunk_data.get(key) == value for key, value in chunk_description.items()):
+            matches.append((chunk_name, chunk_data))
+
+    # Check for duplicates
+    if len(matches) > 1:
+        print("Error: Multiple chunks match the given description. No changes were applied.")
+        for chunk_name, _ in matches:
+            print(f"Matching chunk: {chunk_name}")
+        return
+
+    if not matches:
+        print("No matching chunk found.")
+        return
+
+    # Update the utility of the single matching chunk
+    chunk_name, chunk_data = matches[0]
+    chunk_data['utility'] += amount
+
+    # Ensure utility doesn't drop below 0
+    if chunk_data['utility'] < 0:
+        chunk_data['utility'] = 0
+
+    # If a max_utility is specified, ensure utility doesn't exceed it
+    if max_utility is not None and chunk_data['utility'] > max_utility:
+        chunk_data['utility'] = max_utility
+
+    print(f"Updated utility for {chunk_name}: {chunk_data['utility']}")
+
+
+
+
+
+
 def decay_all_memory_chunks(memories, memory_store, decay_amount):
     # Ensure the specified memory store exists in memories
     if memory_store in memories:
@@ -132,20 +181,19 @@ def adjust_production_utility(production_systems, system_name, production_name, 
     else:
         print(f"Production system '{system_name}' not found.")
 
-def report_memory_contents(memory, memory_name, matches=None, negations=None):
+def report_memory_contents(memory, matches=None, negations=None):
     """
     Reports the contents of a selected memory, including utility levels and whether a chunk matched given criteria.
 
     Args:
         memory (dict): The memory to report on (e.g., declarative or environment memory).
-        memory_name (str): The name of the memory (for labeling purposes in the output).
         matches (dict, optional): Criteria for matching. The chunk must contain these key-value pairs to match.
         negations (dict, optional): Criteria for negations. If a chunk contains these key-value pairs, it will not match.
 
     Returns:
         None
     """
-    print(f"\n--- Memory Report: {memory_name} ---")
+    print("\n--- Memory Report ---")
 
     if matches:
         print(f"Match Criteria: {matches}")
@@ -186,54 +234,8 @@ def report_memory_contents(memory, memory_name, matches=None, negations=None):
         else:
             print("  No utility information.")
 
-    print(f"--- End of {memory_name} Report ---\n")
+    print("--- End of Memory Report ---\n")
 
-
-# def report_memory_contents(memory, memory_name, cue=None):
-#     """
-#     Reports the contents of a selected memory, including utility levels and whether a chunk matched a given cue.
-#
-#     Args:
-#         memory (dict): The memory to report on (e.g., declarative or environment memory).
-#         memory_name (str): The name of the memory (for labeling purposes in the output).
-#         cue (dict, optional): A cue to check matches against. If provided, will report whether each chunk matches.
-#
-#     Returns:
-#         None
-#     """
-#     print(f"\n--- Memory Report: {memory_name} ---")
-#
-#     if cue:
-#         print(f"Match Criterion: {cue['matches']}, Negations: {cue.get('negations', {})}")
-#
-#     if not memory:
-#         print("The memory is empty.")
-#         return
-#
-#     for chunk_name, chunk_data in memory.items():
-#         print(f"Chunk '{chunk_name}':")
-#
-#         # Check if a chunk matches the cue, if cue is provided
-#         if cue:
-#             match, _ = Utility.buffer_match_eval_diagnostic(chunk_data, cue.get('matches', {}),
-#                                                             cue.get('negations', {}))
-#             if match:
-#                 print("  Match status: MATCHED")
-#             else:
-#                 print("  Match status: DID NOT MATCH")
-#
-#         # Print each key-value pair in the chunk, except utility (handled separately)
-#         for key, value in chunk_data.items():
-#             if key != 'utility':
-#                 print(f"  {key}: {value}")
-#
-#         # Print utility if available
-#         if 'utility' in chunk_data:
-#             print(f"  Utility: {chunk_data['utility']}")
-#         else:
-#             print("  No utility information.")
-#
-#     print(f"--- End of {memory_name} Report ---\n")
 
 def add_noise_to_utility(memory, memory_name, scalar=1.0):
     """
@@ -530,3 +532,58 @@ def add_noise_to_utility(memory, memory_name, scalar=1.0):
 #         print(f"No chunk met the utility threshold of {utility_threshold}.")
 #         return {'name': 'no_match', 'utility': 0, 'message': 'No matching chunk found'}
 
+# def report_memory_contents(memory, memory_name, matches=None, negations=None):
+#     """
+#     Reports the contents of a selected memory, including utility levels and whether a chunk matched given criteria.
+#
+#     Args:
+#         memory (dict): The memory to report on (e.g., declarative or environment memory).
+#         memory_name (str): The name of the memory (for labeling purposes in the output).
+#         matches (dict, optional): Criteria for matching. The chunk must contain these key-value pairs to match.
+#         negations (dict, optional): Criteria for negations. If a chunk contains these key-value pairs, it will not match.
+#
+#     Returns:
+#         None
+#     """
+#     print(f"\n--- Memory Report: {memory_name} ---")
+#
+#     if matches:
+#         print(f"Match Criteria: {matches}")
+#     if negations:
+#         print(f"Negation Criteria: {negations}")
+#
+#     if not memory:
+#         print("The memory is empty.")
+#         return
+#
+#     for chunk_name, chunk_data in memory.items():
+#         print(f"Chunk '{chunk_name}':")
+#
+#         # Check if the chunk matches the criteria
+#         match = True
+#         if matches:
+#             for key, value in matches.items():
+#                 if key not in chunk_data or (value != '*' and chunk_data[key] != value):
+#                     match = False
+#                     break
+#         if match and negations:
+#             for neg_key, neg_value in negations.items():
+#                 if neg_key in chunk_data and (neg_value == '*' or chunk_data[neg_key] == neg_value):
+#                     match = False
+#                     break
+#
+#         # Print match status
+#         print("  Match status:", "MATCHED" if match else "DID NOT MATCH")
+#
+#         # Print each key-value pair in the chunk, except utility (handled separately)
+#         for key, value in chunk_data.items():
+#             if key != 'utility':
+#                 print(f"  {key}: {value}")
+#
+#         # Print utility if available
+#         if 'utility' in chunk_data:
+#             print(f"  Utility: {chunk_data['utility']}")
+#         else:
+#             print("  No utility information.")
+#
+#     print(f"--- End of {memory_name} Report ---\n")
