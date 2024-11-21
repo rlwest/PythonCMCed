@@ -102,13 +102,13 @@ def utility_change_by_description(memories, memory_store, chunk_description, amo
 
     # Check for duplicates
     if len(matches) > 1:
-        print("Error: Multiple chunks match the given description. No changes were applied.")
+        print("Error: Multiple chunks match the given BOOST description. No changes were applied.")
         for chunk_name, _ in matches:
             print(f"Matching chunk: {chunk_name}")
         return
 
     if not matches:
-        print("No matching chunk found.")
+        print("No matching chunk found for utility boost.")
         return
 
     # Update the utility of the single matching chunk
