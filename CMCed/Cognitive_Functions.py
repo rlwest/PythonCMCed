@@ -125,11 +125,6 @@ def utility_change_by_description(memories, memory_store, chunk_description, amo
 
     print(f"Updated utility for {chunk_name}: {chunk_data['utility']}")
 
-
-
-
-
-
 def decay_all_memory_chunks(memories, memory_store, decay_amount):
     # Ensure the specified memory store exists in memories
     if memory_store in memories:
@@ -184,6 +179,7 @@ def adjust_production_utility(production_systems, system_name, production_name, 
 def report_memory_contents(memory, matches=None, negations=None):
     """
     Reports the contents of a selected memory, including utility levels and whether a chunk matched given criteria.
+    if matches and negations are not specified it defaults to None and everything is a match
 
     Args:
         memory (dict): The memory to report on (e.g., declarative or environment memory).
@@ -268,322 +264,36 @@ def add_noise_to_utility(memory, memory_name, scalar=1.0):
     # for debugging ############################
 
 
-# def buffer_match_eval_diagnostic(buffer_value, matches, negations):
-#     """
-#     Evaluates whether a chunk matches the provided conditions and returns diagnostic information.
-#
-#     Args:
-#         buffer_value (dict): The chunk data to evaluate.
-#         matches (dict): Criteria that must be present in the chunk for a match.
-#         negations (dict): Criteria that must not be present in the chunk for a match.
-#
-#     Returns:
-#         tuple: (bool, dict) where bool indicates if there is a match, and dict provides any wildcard values.
-#     """
-#     # Diagnostic: Check match criteria
-#     for key, value in matches.items():
-#         if buffer_value.get(key) != value:
-#             print(
-#                 f"[DEBUG] Match failed for chunk on key '{key}' with expected value '{value}', but found '{buffer_value.get(key)}'")
-#             return False, {}
-#
-#     # Diagnostic: Check negation criteria
-#     for key, value in negations.items():
-#         if buffer_value.get(key) == value:
-#             print(f"[DEBUG] Negation matched for chunk on key '{key}' with forbidden value '{value}'")
-#             return False, {}
-#
-#     # If all criteria are met, return match with wildcard values (if applicable)
-#     print(f"[DEBUG] Chunk matched with buffer_value: {buffer_value}")
-#     return True, {}
-#     ###########################################################
+def spreading_activation_boost(memories, memory_store, source_chunk, boost_factor=1):
+    """
+    Boost the utility of chunks in memory based on partial matching with a source chunk.
+    The matching score is determined by counting shared values between the source chunk and each chunk in memory.
 
+    Args:
+        memories (dict): The memory system containing the memory store.
+        memory_store (str): The name of the memory store to search (e.g., 'declarative_memory').
+        source_chunk (dict): The source chunk for spreading activation.
+        boost_factor (float): The multiplier applied to the matching score for utility boost.
 
-# def retrieve_memory_chunk(buffer, matches, negations, utility_threshold=0):
-#     matched_chunks_data = []
-#
-#     for buffer_key, buffer_value in buffer.items():
-#         match = True
-#
-#         # Check for matches
-#         for key, value in matches.items():
-#             if key not in buffer_value or buffer_value[key] != value:
-#                 match = False
-#                 break
-#
-#         # Check for negations, including handling wildcard in negations
-#         for key, value in negations.items():
-#             if key in buffer_value:
-#                 # If wildcard is in negations, any chunk with this slot is negated
-#                 if value == '*' or buffer_value[key] == value:
-#                     match = False
-#                     break
-#
-#         if match:
-#             # Add matched chunk to the list if utility meets or exceeds the threshold
-#             if buffer_value.get('utility', 0) >= utility_threshold:
-#                 matched_chunks_data.append(buffer_value)
-#
-#     # If no chunks matched, return a no-match placeholder
-#     if not matched_chunks_data:
-#         return {"name": "no_match", "utility": 0}
-#
-#     # Find the maximum utility among matched chunks
-#     max_utility = max(chunk.get('utility', 0) for chunk in matched_chunks_data)
-#     max_utility_chunks = [chunk for chunk in matched_chunks_data if chunk.get('utility', 0) == max_utility]
-#
-#     # Randomly select one if multiple chunks have the maximum utility
-#     best_chunk_data = random.choice(max_utility_chunks)
-#     return best_chunk_data
+    Returns:
+        None
+    """
+    if memory_store not in memories:
+        print(f"[ERROR] Memory store '{memory_store}' not found in memories.")
+        return
 
-# def retrieve_memory_chunk(buffer, matches, negations=None, utility_threshold=0):
-#     """
-#     Retrieves the chunk with the highest utility from the buffer that meets the match conditions
-#     and does not violate negation conditions.
-#
-#     Args:
-#         buffer (dict): Memory buffer containing chunks (key-value pairs).
-#         matches (dict): Matching criteria; required attributes in each chunk.
-#         negations (dict): Negation criteria; disallowed attributes in each chunk.
-#         utility_threshold (float, optional): Minimum utility level for chunk consideration. Defaults to 0.
-#
-#     Returns:
-#         dict: The selected chunk based on highest utility or a "no_match" placeholder if none match.
-#     """
-#     matched_chunks_data = []
-#
-#     # Loop through each chunk in the buffer
-#     for buffer_key, buffer_value in buffer.items():
-#         # Check matches
-#         if all((buffer_value.get(key) == value or (value == '*' and key in buffer_value)) for key, value in matches.items()):
-#             # Check negations, if provided
-#             if negations is None or all((buffer_value.get(key) != value) for key, value in negations.items()):
-#                 # Add to matched chunks if both match and negation conditions are met
-#                 matched_chunks_data.append(buffer_value)
-#
-#     # If no chunks matched the criteria, return a "no_match" placeholder
-#     if not matched_chunks_data:
-#         return {"name": "no_match", "utility": 0}
-#
-#     # Find the maximum utility value among matched chunks
-#     max_utility = max(chunk.get('utility', 0) for chunk in matched_chunks_data)
-#
-#     # Filter matched chunks for those meeting the maximum utility and threshold
-#     max_utility_chunks = [chunk for chunk in matched_chunks_data if chunk.get('utility', 0) == max_utility and chunk.get('utility', 0) >= utility_threshold]
-#
-#     # Return a "no_match" placeholder if no chunks meet the utility threshold
-#     if not max_utility_chunks:
-#         return {"name": "no_match", "utility": 0}
-#
-#     # Randomly select a chunk from those with the maximum utility
-#     best_chunk_data = random.choice(max_utility_chunks)
-#
-#     return best_chunk_data
+    memory = memories[memory_store]
+    source_values = set(source_chunk.values())  # Extract values from the source chunk
 
-# def retrieve_memory_chunk(buffer, matches, utility_threshold=0):
-#     """
-#     Retrieves the chunk with the highest utility from a memory buffer, based on exact matching criteria
-#     and mandatory slot presence indicated by wildcards.
-#
-#     Args:
-#         buffer (dict): Memory store with chunks, each as a dictionary of attributes.
-#         matches (dict): Key-value pairs that must be present in a chunk for a match.
-#                         Use '*' to indicate the slot must exist but can hold any value.
-#         utility_threshold (float, optional): Minimum utility level for consideration. Default is 0.
-#
-#     Returns:
-#         dict: The chunk with the highest utility that meets criteria or a placeholder if no match.
-#     """
-#     matched_chunks = []
-#
-#     for buffer_key, chunk in buffer.items():
-#         # Check if all required matches are present in this chunk
-#         match_found = True
-#         for key, value in matches.items():
-#             # If the value is '*', only check if the key exists in the chunk
-#             if value == '*':
-#                 if key not in chunk:
-#                     match_found = False
-#                     print(f"Chunk '{buffer_key}' missing required slot '{key}' for wildcard match.")
-#                     break
-#             # Otherwise, check for an exact match
-#             elif chunk.get(key) != value:
-#                 match_found = False
-#                 print(f"Chunk '{buffer_key}' failed exact match for '{key}': expected '{value}', found '{chunk.get(key)}'.")
-#                 break
-#
-#         # If all conditions match and utility is above the threshold, add to matched_chunks
-#         if match_found and chunk.get('utility', 0) >= utility_threshold:
-#             matched_chunks.append(chunk)
-#         elif match_found:
-#             print(f"Chunk '{buffer_key}' below utility threshold.")
-#
-#     # Return no-match if nothing met criteria
-#     if not matched_chunks:
-#         print("No chunks matched the criteria.")
-#         return {"name": "no_match", "utility": 0}
-#
-#     # Select highest utility chunk or random among ties
-#     max_utility = max(chunk['utility'] for chunk in matched_chunks)
-#     highest_utility_chunks = [chunk for chunk in matched_chunks if chunk['utility'] == max_utility]
-#     return random.choice(highest_utility_chunks)
+    print(f"[DEBUG] Source chunk values for spreading activation: {source_values}")
 
-### for matching
-# def match_chunks_with_diagnostics(buffer, cue, utility_threshold=0):
-#     """
-#     Finds and returns the chunk with the highest utility from a buffer, based on matching criteria.
-#
-#     This function iterates over each chunk in the provided buffer, checks if it meets the conditions
-#     specified in the cue, and collects all matching chunks. Then, it selects the chunk with the
-#     highest utility that exceeds a given threshold, or returns a placeholder if no matches are found.
-#
-#     Args:
-#         buffer (dict): The memory store containing chunks, where each key is a chunk identifier,
-#                        and each value is a dictionary representing the chunk's attributes.
-#         cue (dict): Contains 'matches' and 'negations' criteria for chunk matching.
-#                     - 'matches': Specifies key-value pairs that must be present in a chunk for it to match.
-#                     - 'negations': Specifies key-value pairs that must not be present in a chunk for it to match.
-#         utility_threshold (float, optional): Minimum utility level required for a chunk to be considered.
-#                                              Defaults to 0.
-#
-#     Returns:
-#         dict: The chunk with the highest utility that meets the match criteria and exceeds the threshold.
-#               If no chunk meets the criteria, returns a placeholder dictionary.
-#     """
-#
-#     # Initialize an empty list to store data of chunks that match the criteria.
-#     matched_chunks_data = []
-#
-#     # Loop through each chunk in the buffer
-#     for buffer_key, buffer_value in buffer.items():
-#         # Evaluate if the chunk matches the given 'matches' and 'negations' criteria in the cue.
-#         # Also retrieves any wildcard values for unspecified matching.
-#         match, wildcard_values = Utility.buffer_match_eval_diagnostic(
-#             buffer_value, cue['matches'], cue['negations']
-#         )
-#
-#         # If the chunk matches the criteria, it proceeds to add it to matched_chunks_data.
-#         if match:
-#             # Copy the data of the matched chunk to avoid altering the original data in the buffer.
-#             matched_chunk_data = buffer_value.copy()
-#
-#             # Update the copied chunk data with any wildcard values (if any were found).
-#             matched_chunk_data.update(wildcard_values)
-#
-#             # Append the modified chunk data to matched_chunks_data for later processing.
-#             matched_chunks_data.append(matched_chunk_data)
-#
-#             # Log debug info to show which chunks matched and their wildcard values.
-#             print(f"Appending {buffer_key} to matches with wildcard values: {wildcard_values}")
-#
-#     # If no chunks matched the criteria, return a placeholder dictionary to indicate no match.
-#     if not matched_chunks_data:
-#         print("No chunks matched the criteria.")
-#         return {"name": "no_match", "utility": 0}
-#
-#     # Find the maximum utility value among the matched chunks.
-#     # This will help us filter for the highest-utility chunks.
-#     max_utility = max(chunk.get('utility', 0) for chunk in matched_chunks_data)
-#     print(f"Max utility found: {max_utility}")
-#
-#     # Filter the matched chunks to include only those with utility equal to the maximum.
-#     # This ensures we’re working with the most relevant chunks based on utility.
-#     max_utility_chunks = [
-#         chunk for chunk in matched_chunks_data
-#         if chunk.get('utility', 0) == max_utility and chunk.get('utility', 0) >= utility_threshold
-#     ]
-#     print(f"Chunks with max utility: {max_utility_chunks}")
-#
-#     # If no chunks meet the utility threshold, return a placeholder dictionary.
-#     if not max_utility_chunks:
-#         print("No chunks meet the utility threshold.")
-#         return {"name": "no_match", "utility": 0}
-#
-#     # Randomly select one chunk from those with the maximum utility.
-#     # This adds randomness in case there are multiple chunks with the same high utility.
-#     best_chunk_data = random.choice(max_utility_chunks)
-#     print(f"Randomly selected chunk: {best_chunk_data}")
-#
-#     # Return the selected chunk as the best match based on utility and the matching criteria.
-#     return best_chunk_data
+    for chunk_name, chunk_data in memory.items():
+        chunk_values = set(chunk_data.values())  # Extract values from the target chunk
+        match_score = len(source_values & chunk_values)  # Count intersecting values
+        utility_boost = match_score * boost_factor
 
-# def match_chunks_with_diagnostics(buffer, cue, utility_threshold=0):
-# # note - if no threshold is set in the production the default is 0
-# #        because utility cannot go below zero, nothing goes below threshold
-#     matched_chunks_data = []  # Store matched chunks
-#     for buffer_key, buffer_value in buffer.items():
-#         # Perform the matching and capture wildcard values
-#         match, wildcard_values = Utility.buffer_match_eval_diagnostic(buffer_value, cue['matches'], cue['negations'])
-#         if match:
-#             # Copy matching chunk data and include wildcard values
-#             matched_chunk_data = buffer_value.copy()
-#             matched_chunk_data.update(wildcard_values)
-#             matched_chunks_data.append(matched_chunk_data)
-#             print(f"Appending {buffer_key} to matches with wildcard values: {wildcard_values}")
-#
-#     # Select the best chunk based on utility
-#     best_chunk_data = Utility.find_max(matched_chunks_data)
-#
-#     # Check if the best chunk's utility meets or exceeds the threshold
-#     if best_chunk_data and best_chunk_data.get('utility', 0) >= utility_threshold:
-#         return best_chunk_data
-#     else:
-#         # Return a generic "failed" chunk if no valid match is found
-#         print(f"No chunk met the utility threshold of {utility_threshold}.")
-#         return {'name': 'no_match', 'utility': 0, 'message': 'No matching chunk found'}
+        # Apply the utility boost
+        chunk_data['utility'] += utility_boost
 
-# def report_memory_contents(memory, memory_name, matches=None, negations=None):
-#     """
-#     Reports the contents of a selected memory, including utility levels and whether a chunk matched given criteria.
-#
-#     Args:
-#         memory (dict): The memory to report on (e.g., declarative or environment memory).
-#         memory_name (str): The name of the memory (for labeling purposes in the output).
-#         matches (dict, optional): Criteria for matching. The chunk must contain these key-value pairs to match.
-#         negations (dict, optional): Criteria for negations. If a chunk contains these key-value pairs, it will not match.
-#
-#     Returns:
-#         None
-#     """
-#     print(f"\n--- Memory Report: {memory_name} ---")
-#
-#     if matches:
-#         print(f"Match Criteria: {matches}")
-#     if negations:
-#         print(f"Negation Criteria: {negations}")
-#
-#     if not memory:
-#         print("The memory is empty.")
-#         return
-#
-#     for chunk_name, chunk_data in memory.items():
-#         print(f"Chunk '{chunk_name}':")
-#
-#         # Check if the chunk matches the criteria
-#         match = True
-#         if matches:
-#             for key, value in matches.items():
-#                 if key not in chunk_data or (value != '*' and chunk_data[key] != value):
-#                     match = False
-#                     break
-#         if match and negations:
-#             for neg_key, neg_value in negations.items():
-#                 if neg_key in chunk_data and (neg_value == '*' or chunk_data[neg_key] == neg_value):
-#                     match = False
-#                     break
-#
-#         # Print match status
-#         print("  Match status:", "MATCHED" if match else "DID NOT MATCH")
-#
-#         # Print each key-value pair in the chunk, except utility (handled separately)
-#         for key, value in chunk_data.items():
-#             if key != 'utility':
-#                 print(f"  {key}: {value}")
-#
-#         # Print utility if available
-#         if 'utility' in chunk_data:
-#             print(f"  Utility: {chunk_data['utility']}")
-#         else:
-#             print("  No utility information.")
-#
-#     print(f"--- End of {memory_name} Report ---\n")
+        print(f"[DEBUG] Chunk '{chunk_name}': Match score = {match_score}, Utility boost = {utility_boost}")
+        print(f"[DEBUG] Updated utility for chunk '{chunk_name}': {chunk_data['utility']}")
