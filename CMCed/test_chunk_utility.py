@@ -3,10 +3,11 @@ from CMCed.production_cycle import ProductionCycle
 from CMCed.Cognitive_Functions import *
 
 # Initialize memories
-working_memory = {'focus_buffer': {'step': 1}, 'target_buffer': {'fries': {'name': 'fries',
-                                                                           'condition': 'good',
-                                                                           'side_order': 'yes',
-                                                                           'extra': 'yes'}}}
+working_memory = {'focus_buffer': {'step': 1},
+                  'target_buffer': {'name': 'fries',
+                                    'condition': 'good',
+                                    'side_order': 'yes',
+                                    'extra': 'yes'}}
 
 # note, all chunks need to have a different name
 # if two have the same name the second one will overwrite the first
@@ -33,11 +34,12 @@ declarative_memory = {'fries': {'name': 'fries',
                                        'utility':4}}
 environment_memory = {}
 
+
+
 memories = {
     'working_memory': working_memory,
     'declarative_memory': declarative_memory,
-    'environment_memory': environment_memory,
-}
+    'environment_memory': environment_memory}
 
 def do_steps(memories): # function for stepping through productions by counting
     current_step = memories['working_memory']['focus_buffer']['step']  # Accessing 'step' within 'focus_buffer'
@@ -55,7 +57,7 @@ def p1(memories):
     do_steps(memories)
     print('house salad utility should be boosted to 7')
     # describe the chunk you want boosted
-    chunk_description = {'name': 'house_salad', 'condition': 'good', 'side_order': 'yes', 'utility':5}
+    chunk_description = {'name': 'house_salad', 'condition': 'good'}
     print(chunk_description)
     # boost utility
     utility_change_by_description(memories, 'declarative_memory', chunk_description, amount=2, max_utility=10)
@@ -71,15 +73,11 @@ def p2(memories):
     # boost a chunk with a description from a buffer using utility_change_by_description
     do_steps(memories)
     print('fries utility should be boosted to 9')
-    # Step 1: Access the target buffer
-    target_buffer = memories['working_memory']['target_buffer']
-    # Step 2: Retrieve all the values from the dictionary
-    chunk_values = list(target_buffer.values())
-    # Step 3: Get the first (and only) chunk (index=0)
-    chunk_description = chunk_values[0]
-    # Print the result for clarity
+    # Access the target buffer directly
+    chunk_description = memories['working_memory']['target_buffer']
+    # Print the chunk description for clarity
     print("Extracted chunk description:", chunk_description)
-    #boost utility
+    # Boost utility
     utility_change_by_description(memories, 'declarative_memory', chunk_description, amount=2, max_utility=10)
     #report_memory_contents(declarative_memory)
 ProceduralProductions.append({
@@ -142,15 +140,28 @@ ProceduralProductions.append({
     'report': "step 5"
 })
 
-def p6(memories):
-    do_steps(memories)
-ProceduralProductions.append({
-    'matches': {'working_memory': {'focus_buffer': {'step': 6}}},
-    'negations': {},
-    'utility': 10,
-    'action': p6,
-    'report': "step 6"
-})
+# def p6(memories):
+#     do_steps(memories)
+#     # boost a chunk with a description from a buffer using utility_change_by_description
+#
+#     # Step 1: Access the target buffer
+#     target_buffer = memories['working_memory']['target_buffer']
+#     # Step 2: Retrieve all the values from the dictionary
+#     chunk_values = list(target_buffer.values())
+#     # Step 3: Get the first (and only) chunk (index=0)
+#     chunk_description = chunk_values[0]
+#     # Print the result for clarity
+#     print("Extracted chunk description:", chunk_description)
+#     #boost utility
+#     utility_change_by_description(memories, 'declarative_memory', chunk_description, amount=2, max_utility=10)
+#     #report_memory_contents(declarative_memory)
+# ProceduralProductions.append({
+#     'matches': {'working_memory': {'focus_buffer': {'step': 6}}},
+#     'negations': {},
+#     'utility': 10,
+#     'action': p6,
+#     'report': "step 6"
+# })
 
 # Production system delays in ticks
 ProductionSystem1_Countdown = 1
