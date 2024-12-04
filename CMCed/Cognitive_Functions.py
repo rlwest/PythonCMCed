@@ -5,9 +5,11 @@ from CMCed.utility import *
 
 import random
 
+
 def retrieve_memory_chunk(buffer, matches, negations={}, utility_threshold=0):
     """
-    Retrieve the highest utility chunk that meets match criteria and negation constraints.
+    Retrieve the highest utility chunk that meets match criteria and negation constraints,
+    excluding the 'utility' slot from both matching and the final returned result.
 
     Args:
         buffer (dict): Memory buffer containing chunks.
@@ -16,27 +18,29 @@ def retrieve_memory_chunk(buffer, matches, negations={}, utility_threshold=0):
         utility_threshold (int, optional): Minimum utility required to consider a chunk.
 
     Returns:
-        dict: The chunk with the highest utility or a placeholder if no matches.
+        dict: The chunk with the highest utility (excluding 'utility') or a placeholder if no matches.
     """
     matched_chunks = []
 
     # Iterate through each chunk in the buffer to check for matches
     for chunk in buffer.values():
+        # Exclude 'utility' slot from the chunk for matching purposes
+        filtered_chunk = {k: v for k, v in chunk.items() if k != 'utility'}
         match = True
 
         # Check positive matches
         for key, value in matches.items():
-            if key not in chunk:  # Slot must exist for wildcard match
+            if key not in filtered_chunk:  # Slot must exist for wildcard match
                 match = False
                 break
-            elif value != '*' and chunk[key] != value:  # Specific value required, no wildcard
+            elif value != '*' and filtered_chunk[key] != value:  # Specific value required, no wildcard
                 match = False
                 break
 
         # Check negations
         for key, value in negations.items():
-            if key in chunk:  # Slot must exist for wildcard negation
-                if value == '*' or chunk[key] == value:  # Any value in this slot negates the match
+            if key in filtered_chunk:  # Slot must exist for wildcard negation
+                if value == '*' or filtered_chunk[key] == value:  # Any value in this slot negates the match
                     match = False
                     break
 
@@ -46,14 +50,69 @@ def retrieve_memory_chunk(buffer, matches, negations={}, utility_threshold=0):
 
     # Return placeholder if no chunks matched
     if not matched_chunks:
-        return {"name": "no_match", "utility": 0}
+        return {"name": "no_match"}
 
     # Find the highest-utility chunk among matches
     max_utility = max(chunk.get('utility', 0) for chunk in matched_chunks)
     best_chunks = [chunk for chunk in matched_chunks if chunk.get('utility', 0) == max_utility]
 
     # Randomly select one chunk if multiple have the same max utility
-    return random.choice(best_chunks)
+    selected_chunk = random.choice(best_chunks)
+
+    # Remove the 'utility' slot from the returned chunk
+    result_chunk = {k: v for k, v in selected_chunk.items() if k != 'utility'}
+
+    return result_chunk
+
+# def retrieve_memory_chunk(buffer, matches, negations={}, utility_threshold=0):
+#     """
+#     Retrieve the highest utility chunk that meets match criteria and negation constraints.
+#
+#     Args:
+#         buffer (dict): Memory buffer containing chunks.
+#         matches (dict): Key-value pairs to match in each chunk. '*' indicates any value is acceptable if the slot exists.
+#         negations (dict): Key-value pairs to avoid in each chunk. '*' indicates any value in the slot will negate the match.
+#         utility_threshold (int, optional): Minimum utility required to consider a chunk.
+#
+#     Returns:
+#         dict: The chunk with the highest utility or a placeholder if no matches.
+#     """
+#     matched_chunks = []
+#
+#     # Iterate through each chunk in the buffer to check for matches
+#     for chunk in buffer.values():
+#         match = True
+#
+#         # Check positive matches
+#         for key, value in matches.items():
+#             if key not in chunk:  # Slot must exist for wildcard match
+#                 match = False
+#                 break
+#             elif value != '*' and chunk[key] != value:  # Specific value required, no wildcard
+#                 match = False
+#                 break
+#
+#         # Check negations
+#         for key, value in negations.items():
+#             if key in chunk:  # Slot must exist for wildcard negation
+#                 if value == '*' or chunk[key] == value:  # Any value in this slot negates the match
+#                     match = False
+#                     break
+#
+#         # Add chunk if it matches and meets the utility threshold
+#         if match and chunk.get('utility', 0) >= utility_threshold:
+#             matched_chunks.append(chunk)
+#
+#     # Return placeholder if no chunks matched
+#     if not matched_chunks:
+#         return {"name": "no_match", "utility": 0}
+#
+#     # Find the highest-utility chunk among matches
+#     max_utility = max(chunk.get('utility', 0) for chunk in matched_chunks)
+#     best_chunks = [chunk for chunk in matched_chunks if chunk.get('utility', 0) == max_utility]
+#
+#     # Randomly select one chunk if multiple have the same max utility
+#     return random.choice(best_chunks)
 
 def utility_change(memories, memory_store, chunk_name, amount, max_utility=None):
     """
@@ -83,21 +142,15 @@ def utility_change(memories, memory_store, chunk_name, amount, max_utility=None)
 
 def utility_change_by_description(memories, memory_store, chunk_description, amount, max_utility=None):
     """
-    Adjust the utility of a specific chunk by finding a match based on its description. Ensures the utility
-    doesn't go below 0 and can optionally be capped by a specified max_utility. If multiple chunks match
-    the description, an error message is printed.
-
-    :param memories: Dictionary of memories (including declarative memory)
-    :param memory_store: The memory store where the chunks reside (e.g., 'declarative_memory')
-    :param chunk_description: A dictionary describing the chunk to find
-    :param amount: The amount to change the utility by (positive or negative)
-    :param max_utility: (Optional) The maximum allowable utility value for the chunk
+    Adjust the utility of a specific chunk by finding a match based on its description,
+    excluding the utility slot from the matching process.
     """
     matches = []  # Keep track of matching chunks
 
-    # Find all matching chunks
+    # Find all matching chunks, ignoring the 'utility' slot
     for chunk_name, chunk_data in memories[memory_store].items():
-        if all(chunk_data.get(key) == value for key, value in chunk_description.items()):
+        filtered_chunk_data = {k: v for k, v in chunk_data.items() if k != 'utility'}
+        if all(filtered_chunk_data.get(key) == value for key, value in chunk_description.items()):
             matches.append((chunk_name, chunk_data))
 
     # Check for duplicates
@@ -123,8 +176,98 @@ def utility_change_by_description(memories, memory_store, chunk_description, amo
     if max_utility is not None and chunk_data['utility'] > max_utility:
         chunk_data['utility'] = max_utility
 
-    print(f"Updated utility for {chunk_name}: {chunk_data['utility']}")
+    print(f"Updated utility for memory key '{chunk_name}': {chunk_data['utility']}")
 
+# def utility_change_by_description(memories, memory_store, chunk_description, amount, max_utility=None):
+#     """
+#     Adjust the utility of a specific chunk by finding a match based on its description. Ensures the utility
+#     doesn't go below 0 and can optionally be capped by a specified max_utility. If multiple chunks match
+#     the description, an error message is printed.
+#
+#     :param memories: Dictionary of memories (including declarative memory)
+#     :param memory_store: The memory store where the chunks reside (e.g., 'declarative_memory')
+#     :param chunk_description: A dictionary describing the chunk to find
+#     :param amount: The amount to change the utility by (positive or negative)
+#     :param max_utility: (Optional) The maximum allowable utility value for the chunk
+#     """
+#     matches = []  # Keep track of matching chunks
+#
+#     # Find all matching chunks
+#     for chunk_name, chunk_data in memories[memory_store].items():
+#         if all(chunk_data.get(key) == value for key, value in chunk_description.items()):
+#             matches.append((chunk_name, chunk_data))
+#
+#     # Check for duplicates
+#     if len(matches) > 1:
+#         print("Error: Multiple chunks match the given BOOST description. No changes were applied.")
+#         for chunk_name, _ in matches:
+#             print(f"Matching chunk: {chunk_name}")
+#         return
+#
+#     if not matches:
+#         print("No matching chunk found for utility boost.")
+#         return
+#
+#     # Update the utility of the single matching chunk
+#     chunk_name, chunk_data = matches[0]
+#     chunk_data['utility'] += amount
+#
+#     # Ensure utility doesn't drop below 0
+#     if chunk_data['utility'] < 0:
+#         chunk_data['utility'] = 0
+#
+#     # If a max_utility is specified, ensure utility doesn't exceed it
+#     if max_utility is not None and chunk_data['utility'] > max_utility:
+#         chunk_data['utility'] = max_utility
+#
+#     # Corrected print statement
+#     print(f"Updated utility for memory key '{chunk_name}': {chunk_data['utility']}")
+
+
+
+# def utility_change_by_description(memories, memory_store, chunk_description, amount, max_utility=None):
+#     """
+#     Adjust the utility of a specific chunk by finding a match based on its description. Ensures the utility
+#     doesn't go below 0 and can optionally be capped by a specified max_utility. If multiple chunks match
+#     the description, an error message is printed.
+#
+#     :param memories: Dictionary of memories (including declarative memory)
+#     :param memory_store: The memory store where the chunks reside (e.g., 'declarative_memory')
+#     :param chunk_description: A dictionary describing the chunk to find
+#     :param amount: The amount to change the utility by (positive or negative)
+#     :param max_utility: (Optional) The maximum allowable utility value for the chunk
+#     """
+#     matches = []  # Keep track of matching chunks
+#
+#     # Find all matching chunks
+#     for chunk_name, chunk_data in memories[memory_store].items():
+#         if all(chunk_data.get(key) == value for key, value in chunk_description.items()):
+#             matches.append((chunk_name, chunk_data))
+#
+#     # Check for duplicates
+#     if len(matches) > 1:
+#         print("Error: Multiple chunks match the given BOOST description. No changes were applied.")
+#         for chunk_name, _ in matches:
+#             print(f"Matching chunk: {chunk_name}")
+#         return
+#
+#     if not matches:
+#         print("No matching chunk found for utility boost.")
+#         return
+#
+#     # Update the utility of the single matching chunk
+#     chunk_name, chunk_data = matches[0]
+#     chunk_data['utility'] += amount
+#
+#     # Ensure utility doesn't drop below 0
+#     if chunk_data['utility'] < 0:
+#         chunk_data['utility'] = 0
+#
+#     # If a max_utility is specified, ensure utility doesn't exceed it
+#     if max_utility is not None and chunk_data['utility'] > max_utility:
+#         chunk_data['utility'] = max_utility
+#
+#     print(f"Updated utility for {chunk_name_in_memory}: {chunk_data['utility']}")
 def decay_all_memory_chunks(memories, memory_store, decay_amount):
     # Ensure the specified memory store exists in memories
     if memory_store in memories:

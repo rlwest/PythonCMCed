@@ -29,7 +29,10 @@ declarative_memory = {'fries': {'name': 'fries',
                       'ceasar_salad': {'name': 'ceasar_salad',
                                        'condition': 'bad',
                                        'side_order': 'no',
-                                       'utility':9}
+                                       'utility':9},
+                      'fido': {'name': 'fido',
+                               'isa':'dog',
+                               'temperment': 'good'}
                       }
 memories = {
     'working_memory': working_memory,
@@ -62,6 +65,8 @@ def announce_sandwich(memories):
     matches = {'side_order': 'yes', 'condition': '*'}
     negations = {'extra': '*'}
     report_memory_contents(buffer, matches, negations)    # print results
+    report_memory_contents(buffer)    # print results
+
 # get the chunk
     retrieved_chunk = retrieve_memory_chunk(buffer, matches, negations)
     print('I recall the side order was.........................................***************************')
