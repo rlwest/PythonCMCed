@@ -46,7 +46,7 @@ ProceduralProductions = []
 # Procedural Production to announce the sandwich is ready
 def announce_sandwich(memories):
     # add noise
-    #add_noise_to_utility(declarative_memory, 'declarative_memory', scalar=0.5)
+    add_noise_to_utility(declarative_memory, 'declarative_memory', scalar=0.5)
     # add decay
     #decay_all_memory_chunks(memories, 'declarative_memory',1)
     # add boost
