@@ -1,7 +1,7 @@
 #  this file uses motor productions to model actions in the environment that take time
 
 from CMCed.production_cycle import ProductionCycle
-from CMCed.Cognitive_Functions import *
+
 
 ### works but only complete up to cheese
 ### may be some issues still
@@ -26,7 +26,6 @@ def bread1(memories):
     memories['working_memory']['focusbuffer']['state'] = 'cheese'
     # print(f"bread1 executed. Updated working_memory: {memories['working_memory']}")
     print('*********************************************************************************** 1')
-
 ProceduralProductions.append({
     'matches': {'working_memory': {'focusbuffer': {'state': 'bread1'}, 'motorbuffer': {'state': 'no_action'}}},
     'negations': {},

@@ -33,8 +33,6 @@ def bread1(memories):
     })
     memories['working_memory']['focus_buffer']['state'] = 'cheese'
     print(f"bread1 executed. Updated working_memory: {memories['working_memory']}")
-
-
 ProceduralProductions.append({
     'matches': {'working_memory': {'focus_buffer': {'state': 'bread1'}, 'motor_buffer': {'state': 'no_action'}}},
     'negations': {},
@@ -56,8 +54,6 @@ def cheese(memories):
     })
     memories['working_memory']['focus_buffer']['state'] = 'ham'
     print(f"cheese executed. Updated working_memory: {memories['working_memory']}")
-
-
 ProceduralProductions.append({
     'matches': {'working_memory': {'focus_buffer': {'state': 'cheese'}, 'motor_buffer': {'state': 'no_action'}}},
     'negations': {},
@@ -79,8 +75,6 @@ def ham(memories):
     })
     memories['working_memory']['focus_buffer']['state'] = 'bread2'
     print(f"ham executed. Updated working_memory: {memories['working_memory']}")
-
-
 ProceduralProductions.append({
     'matches': {'working_memory': {'focus_buffer': {'state': 'ham'}, 'motor_buffer': {'state': 'no_action'}}},
     'negations': {},
@@ -102,8 +96,6 @@ def bread2(memories):
     })
     memories['working_memory']['focus_buffer']['state'] = 'done'
     print(f"bread2 executed. Updated working_memory: {memories['working_memory']}")
-
-
 ProceduralProductions.append({
     'matches': {'working_memory': {'focus_buffer': {'state': 'bread2'}, 'motor_buffer': {'state': 'no_action'}}},
     'negations': {},
@@ -116,8 +108,6 @@ ProceduralProductions.append({
 # Procedural Production to announce the sandwich is ready
 def announce_sandwich(memories):
     print("Ham and cheese sandwich is ready!")
-
-
 ProceduralProductions.append({
     'matches': {'working_memory': {'focus_buffer': {'state': 'done'}, 'motor_buffer': {'state': 'no_action'}}},
     'negations': {},
@@ -146,13 +136,10 @@ def delayed_action(memories):
     env_object = motorbuffer['env_object']
     slot = motorbuffer['slot']
     newslotvalue = motorbuffer['newslotvalue']
-
     memories['environment_memory'][env_object][slot] = newslotvalue
     memories['working_memory']['motor_buffer']['state'] = 'no_action'
     print(f"delayed_action executed. Updated environment_memory: {memories['environment_memory']}")
     print(f"delayed_action executed. Updated working_memory: {memories['working_memory']}")
-
-
 MotorProductions.append({
     'matches': {'working_memory': {'motor_buffer': {'state': 'do_action'}}},
     'negations': {},
@@ -161,6 +148,8 @@ MotorProductions.append({
     'report': "move_item",
     'delayed_action': delayed_action
 })
+
+
 
 # Production system delays in ticks
 ProductionSystem1_Countdown = 1
